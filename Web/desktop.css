@@ -1,0 +1,276 @@
+/* Orb Music for Windows: native-player spacing, surfaces and album art. */
+:root { --host-footer-space: 0px; --netlify-badge-clearance: 0px; }
+body { overscroll-behavior: none; }
+.sidebar-bottom #orb-desktop-status {
+  color: var(--accent); font-size: 10px; font-weight: 600;
+  padding: 9px 10px; margin-bottom: 16px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+/* The website reserves horizontal space for a Netlify badge. Windows doesn't. */
+@media(min-width: 1151px) {
+  .transport { grid-template-columns: minmax(180px,1fr) minmax(280px,1.35fr) minmax(190px,1fr) !important; gap: 20px !important; padding: 12px 28px !important; }
+  .transport-right { padding-right: 0 !important; gap: 12px !important; }
+  .transport-right input { width: 100px; max-width: 100%; }
+}
+@media(min-width:741px) and (max-width:1150px) {
+  .transport { grid-template-columns: minmax(145px,1fr) minmax(220px,1.15fr) minmax(190px,.8fr) !important; gap: 10px !important; }
+  .transport-right { padding-right: 0 !important; gap: 5px !important; }
+  .transport-right #volume, .transport-right #mute { display: initial !important; }
+  .transport-right #volume { width: 58px; }
+}
+.transport-right { min-width: 0; }
+.transport-right .icon-button { flex-shrink: 0; }
+.transport-middle { width:100%; }
+/* Video thumbs may contain horizontal black bars baked into their pixels.
+   Only those images are zoomed, inside a square clipping shell. */
+.orb-art-crop { display: block; position:relative; isolation:isolate; overflow:hidden; background:var(--surface); flex-shrink:0; }
+.orb-art-crop > img { display:block; width:100%; height:100%; max-width:none; object-fit:cover; object-position:center; margin:0; border:0; border-radius:0; }
+.orb-art-crop > img.orb-video-thumb { transform:scale(1.34); transform-origin:center; }
+.music-card .orb-art-crop.card-art { width:100%; aspect-ratio:1; height:auto; border-radius:20px; margin-bottom:12px; }
+.track-row .orb-art-crop { width:44px; height:44px; border-radius:10px; }
+.track-summary > .orb-art-crop { width:56px; height:56px; border-radius:14px; }
+.full-art > .orb-art-crop { width:100%; height:100%; border-radius:inherit; }
+@media(max-width:740px) { .track-summary > .orb-art-crop { width:46px; height:46px; } }
+/* Expanded player: coherent layout with secondary functions under transport. */
+#now-playing { width:min(1120px,94vw); max-width:1120px; padding:clamp(28px,4vw,54px); gap:clamp(24px,4vw,58px); }
+#now-playing .full-info { min-width:0; }
+#now-playing .full-art { border-radius:24px; }
+#now-playing .full-controls { gap:clamp(18px,3vw,34px); justify-content:center; margin-top:22px; }
+#now-playing .full-controls > .icon-button { width:46px; height:46px; }
+#now-playing .full-controls > .icon-button svg { width:23px; height:23px; }
+#now-playing .eyebrow { letter-spacing:2px; }
+#playback-status { margin-top:18px; min-height:1.7em; }
+.orb-expanded-actions { display:flex; align-items:center; justify-content:center; gap:28px; margin-top:22px; }
+.orb-expanded-actions .orb-action { display:grid; place-items:center; gap:5px; color:var(--muted); background:transparent; border:0; min-width:66px; padding:8px 10px; border-radius:16px; font:inherit; cursor:pointer; }
+.orb-expanded-actions .orb-action svg { width:21px; height:21px; }
+.orb-expanded-actions .orb-action span { font-size:11px; }
+.orb-expanded-actions .orb-action:hover { color:var(--ink); background:color-mix(in srgb,var(--ink) 7%,transparent); }
+.orb-expanded-actions .orb-action[aria-pressed=true] { color:var(--accent); }
+#orb-desktop-lyrics { border:1px solid var(--line); color:var(--ink); background:var(--elevated); border-radius:30px; width:min(650px,90vw); max-height:85dvh; padding:28px; box-shadow:0 25px 90px #0005; }
+#orb-desktop-lyrics::backdrop { background:#000b; backdrop-filter:blur(14px); }
+.orb-lyrics-head { display:flex; justify-content:space-between; gap:18px; align-items:start; }
+.orb-lyrics-head h2 { font-size:23px; margin:0; }
+.orb-lyrics-head p { color:var(--muted); font-size:12px; margin:6px 0 0; }
+.orb-lyrics-content { overflow:auto; max-height:61dvh; padding:18px 6px 0; font-size:19px; line-height:1.9; white-space:pre-wrap; }
+.orb-lyrics-content .orb-lyric-line { display:block; opacity:.53; transition:opacity .2s,color .2s; padding:2px 0; }
+.orb-lyrics-content .orb-lyric-line.current { opacity:1; color:var(--accent); font-weight:700; }
+.orb-lyrics-note { color:var(--muted); font-size:13px; }
+@media(max-width:740px) { #now-playing { padding:44px 24px 26px; gap:20px; } .orb-expanded-actions { gap:4px; } }
+
+/* Expand Now Playing instead of replacing it when the queue is requested. */
+#now-playing.orb-queue-open {
+  width: min(1420px, 96vw);
+  max-width: 1420px;
+  grid-template-columns: minmax(200px, .95fr) minmax(245px, 1fr) minmax(260px, .85fr);
+  gap: clamp(16px, 2.5vw, 34px);
+  padding: clamp(24px, 3vw, 44px);
+  max-height: 93dvh;
+  align-items: center;
+}
+#now-playing.orb-queue-open .orb-expanded-queue { min-width:0; height:min(68dvh,620px); max-height:100%; }
+#now-playing .orb-expanded-queue[hidden] { display:none !important; }
+.orb-expanded-queue { border-left:1px solid var(--line); padding-left:20px; display:flex; flex-direction:column; overflow:hidden; }
+.orb-expanded-queue-header { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:14px; flex-shrink:0; }
+.orb-expanded-queue-header h3 { font-size:16px; margin:0; font-weight:700; }
+.orb-queue-caption { color:var(--muted); font-size:11px; }
+.orb-queue-heading-actions { display:flex; align-items:center; gap:6px; }
+.orb-queue-clear { color:var(--muted); border:1px solid var(--line); background:transparent; border-radius:999px; padding:8px 12px; font:inherit; font-size:11px; font-weight:600; white-space:nowrap; cursor:pointer; }
+.orb-queue-clear:hover:not(:disabled) { background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink); }
+.orb-queue-clear:disabled { opacity:.4; cursor:default; }
+.orb-expanded-queue-list { overflow-y:auto; overflow-x:hidden; min-height:0; flex:1; scrollbar-width:thin; }
+.orb-expanded-queue-list .track-row { padding:10px 3px; gap:10px; width:100%; }
+.orb-expanded-queue-list .track-row.active { border-radius:12px; background:color-mix(in srgb,var(--accent) 12%,transparent); }
+.orb-expanded-queue-list .track-row .row-index { display:none; }
+.orb-expanded-queue-list .track-row .row-info { min-width:0; }
+.orb-expanded-queue-list .track-row .row-info strong, .orb-expanded-queue-list .track-row .row-info span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.orb-expanded-queue-list .track-row time { display:none; }
+.orb-expanded-queue-list .track-row > img, .orb-expanded-queue-list .track-row > .orb-art-crop, .orb-expanded-queue-list .track-row > .art-placeholder { flex-shrink:0; width:42px; height:42px; border-radius:10px; }
+.queue-panel .queue-heading { gap:6px; }
+.queue-panel .queue-heading h2 { margin:0; }
+@media (max-width:1100px) {
+ #now-playing.orb-queue-open { grid-template-columns:minmax(145px,.75fr) minmax(190px,1fr) minmax(205px,.92fr); gap:14px; padding:25px 20px; }
+ #now-playing.orb-queue-open .orb-expanded-queue { padding-left:12px; }
+ .orb-expanded-queue-header { flex-wrap:wrap; }
+}
+@media (max-width:740px) {
+ #now-playing.orb-queue-open { grid-template-columns:1fr; max-height:94dvh; overflow-y:auto; align-items:start; gap:14px; }
+ #now-playing.orb-queue-open .full-art { display:none; }
+ #now-playing.orb-queue-open .orb-expanded-queue { height:min(43dvh,360px); border-left:0; border-top:1px solid var(--line); padding:16px 0 0; }
+ #now-playing.orb-queue-open .full-info h2 { margin:2px 0; }
+}
+
+/* Same title-row treatment as Android: E badge and like immediately beside song name. */
+.orb-mini-track { display:flex; align-items:center; min-width:0; gap:6px; }
+.orb-mini-track > .track-summary { min-width:0; flex:1 1 auto; }
+.orb-mini-track .orb-like-button { flex:0 0 34px; width:34px; height:34px; }
+.orb-track-name { display:flex; align-items:center; min-width:0; gap:6px; }
+.orb-track-name strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.orb-full-title-row { display:flex; align-items:center; gap:12px; min-width:0; }
+.orb-full-title-row h2 { min-width:0; flex:0 1 auto; }
+.orb-like-button { appearance:none; background:transparent; border:0; color:var(--muted); cursor:pointer; display:grid; place-items:center; border-radius:50%; width:42px; height:42px; padding:9px; flex-shrink:0; }
+.orb-like-button svg { width:21px; height:21px; fill:transparent; stroke:currentColor; stroke-width:1.7; }
+.orb-like-button:hover:not(:disabled) { color:var(--ink); background:color-mix(in srgb,var(--ink) 8%,transparent); }
+.orb-like-button[aria-pressed="true"] { color:var(--accent); }
+.orb-like-button[aria-pressed="true"] svg { fill:currentColor; stroke:currentColor; }
+.orb-like-button:disabled { opacity:.45; cursor:default; }
+.orb-explicit-badge { display:inline-grid; place-items:center; border:1px solid currentColor; border-radius:3px; font-weight:800; font-size:11px; height:16px; min-width:16px; line-height:1; padding:1px; flex-shrink:0; color:var(--muted); }
+.orb-explicit-badge[hidden] { display:none !important; }
+@media (max-width:950px) { .orb-mini-track .orb-like-button { width:30px; flex-basis:30px; } }
+
+/* Original shapes provided from the Android player's actions. */
+.orb-expanded-actions .orb-action-icon { width:22px; height:22px; display:block; flex:0 0 22px; background:currentColor; mask-size:contain; mask-repeat:no-repeat; mask-position:center; -webkit-mask-size:contain; -webkit-mask-repeat:no-repeat; -webkit-mask-position:center; }
+/* Orb Android-style thinslider: fine track, round worm head, no native bevel. */
+input.orb-worm-seek[type="range"] {
+  --worm-progress:0%; --worm-head:16px; --worm-line:3px;
+  appearance:none; -webkit-appearance:none;
+  background:transparent; height:var(--worm-head); padding:0; margin:0;
+  border:0; cursor:pointer; accent-color:var(--accent);
+}
+input.orb-worm-seek[type="range"]::-webkit-slider-runnable-track {
+  height:var(--worm-line); border-radius:999px;
+  background:linear-gradient(to right,var(--accent) 0%,var(--accent) var(--worm-progress),color-mix(in srgb,var(--ink) 24%,transparent) var(--worm-progress),color-mix(in srgb,var(--ink) 24%,transparent) 100%);
+}
+input.orb-worm-seek[type="range"]::-webkit-slider-thumb {
+  appearance:none; -webkit-appearance:none; width:var(--worm-head); height:var(--worm-head);
+  margin-top:calc((var(--worm-line) - var(--worm-head)) / 2);
+  border:0; border-radius:50%; background:var(--accent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 14%,transparent);
+  transition:box-shadow .15s ease,transform .15s ease;
+}
+input.orb-worm-seek[type="range"]:hover::-webkit-slider-thumb,
+input.orb-worm-seek[type="range"]:focus-visible::-webkit-slider-thumb {transform:scale(1.08);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 16%,transparent);}
+input.orb-worm-seek[type="range"]:disabled {cursor:default;opacity:.5;}
+
+
+/* Orb Music Windows 0.1.0-alpha7: compact metadata and precisely aligned actions */
+.orb-mini-track { justify-content:flex-start !important; gap:8px !important; overflow:hidden; }
+.orb-mini-track > .track-summary {
+  flex:0 1 auto !important; width:max-content; max-width:calc(100% - 42px);
+  justify-content:flex-start; gap:12px !important;
+}
+.orb-mini-track .mini-text { flex:0 1 auto; width:max-content; max-width:min(210px,calc(100% - 68px)); }
+.orb-mini-track .mini-text #mini-title { max-width:100%; display:block; }
+.orb-mini-track > #orb-mini-like {
+  flex:0 0 30px !important; width:30px !important; height:34px !important;
+  align-self:center; margin:0 !important; padding:5px;
+}
+.orb-mini-track > #orb-mini-like svg { width:20px; height:20px; }
+#now-playing .orb-full-title-row {
+  display:flex; align-items:center !important; justify-content:flex-start;
+  gap:10px; min-height:48px; margin:16px 0 6px; max-width:100%;
+}
+#now-playing .orb-full-title-row #full-title {
+  margin:0 !important; padding:0 !important; line-height:1.14 !important;
+  width:auto !important; flex:0 1 auto !important; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#now-playing .orb-full-title-row > #orb-full-like {
+  margin:0 !important; align-self:center !important; flex:0 0 38px;
+  width:38px; height:38px; padding:8px;
+}
+#now-playing #full-artist { margin-top:0 !important; }
+#now-playing #playback-status { display:none !important; }
+#now-playing .full-timeline { margin-top:27px !important; }
+#now-playing .orb-expanded-actions { gap:24px; margin-top:22px; }
+/* Media-control icons: high contrast, clean stroke and distinct active state. */
+.transport .controls #shuffle, .transport .controls #repeat {
+  display:grid; place-items:center; width:36px; height:36px;
+  min-width:36px; padding:6px; color:var(--ink); opacity:.90;
+}
+.transport .controls #shuffle svg, .transport .controls #repeat svg {
+  width:22px; height:22px; overflow:visible;
+}
+.transport .controls #shuffle svg path, .transport .controls #repeat svg path { stroke-linecap:round; stroke-linejoin:round; }
+.transport .controls #shuffle:hover, .transport .controls #repeat:hover { opacity:1; }
+.transport .controls #shuffle[aria-pressed="true"], .transport .controls #repeat[aria-pressed="true"] { color:var(--accent); opacity:1; }
+.transport .controls #repeat-one { bottom:-2px; right:0; font-size:9px; font-weight:800; }
+/* Worm-shaped slider: overlay ensures consistent appearance regardless of WebView2 native range skin. */
+.orb-worm-host {
+  --orb-worm-at:0%;
+  --orb-worm-track:3px;
+  --orb-worm-head:17px;
+  position:relative; display:block; min-width:0; flex:1 1 auto;
+  height:24px; isolation:isolate;
+}
+.orb-worm-host::before {
+  content:""; position:absolute; left:0; right:0; top:50%;
+  height:var(--orb-worm-track); transform:translateY(-50%);
+  border-radius:999px; background:color-mix(in srgb,var(--ink) 25%,transparent);
+  pointer-events:none;
+}
+.orb-worm-host .orb-worm-fill {
+  position:absolute; left:0; width:var(--orb-worm-at); height:var(--orb-worm-track);
+  top:50%; transform:translateY(-50%); background:var(--accent);
+  border-radius:999px; pointer-events:none; transition:width .08s linear;
+}
+.orb-worm-host .orb-worm-head {
+  position:absolute; left:var(--orb-worm-at); top:50%;
+  width:var(--orb-worm-head); height:var(--orb-worm-head);
+  border-radius:50%; background:var(--accent);
+  transform:translate(-50%,-50%);
+  pointer-events:none; transition:left .08s linear;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 15%,transparent);
+}
+.orb-worm-host:has(input:disabled) .orb-worm-fill,
+.orb-worm-host:has(input:disabled) .orb-worm-head { opacity:.55; }
+.orb-worm-host:focus-within .orb-worm-head { box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 22%,transparent); }
+.orb-worm-host input[type="range"] {
+  position:absolute !important; inset:0 !important;
+  width:100% !important; height:100% !important;
+  margin:0 !important; padding:0 !important; opacity:0 !important;
+  background:transparent !important; z-index:2; cursor:pointer;
+}
+.orb-worm-host input[type="range"]:disabled { cursor:default; }
+.orb-worm-host input[type="range"]:focus-visible { outline:2px solid var(--accent); border-radius:8px; }
+@media(max-width:740px) {
+ .orb-mini-track .mini-text { max-width:min(135px,calc(100% - 60px)); }
+ .orb-worm-host { --orb-worm-head:14px; }
+}
+
+/* Orb Windows alpha8: real sinusoidal waveform in both seek bars. */
+.orb-worm-host .orb-worm-fill,.orb-worm-host .orb-worm-head {display:none !important;}
+.orb-worm-host {position:relative;overflow:visible;height:25px;}
+.orb-worm-host::before {height:3px;opacity:.85;}
+.orb-worm-visual {position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none;color:var(--accent);}
+.orb-worm-wave {fill:none;stroke:currentColor;stroke-width:3px;stroke-linecap:round;stroke-linejoin:round;}
+.orb-worm-head-dot {fill:currentColor;}
+.orb-worm-host input[type="range"] {opacity:0 !important;z-index:3;}
+.transport #shuffle {opacity:1 !important;}
+.transport #shuffle svg {width:23px;height:23px;}
+#now-playing.orb-side-open {
+ width:min(1420px,96vw);max-width:1420px;
+ grid-template-columns:minmax(200px,.95fr) minmax(245px,1fr) minmax(280px,.92fr);
+ gap:clamp(16px,2.5vw,34px);padding:clamp(24px,3vw,44px);max-height:93dvh;
+}
+#orb-desktop-lyrics[hidden]{display:none !important;}
+#orb-desktop-lyrics.orb-expanded-lyrics {
+ position:static;display:flex;flex-direction:column;overflow:hidden;
+ border:0;border-left:1px solid var(--line);border-radius:0;
+ width:auto;max-height:none;height:min(68dvh,620px);min-width:0;
+ padding:0 0 0 20px;margin:0;background:none;box-shadow:none;
+}
+#orb-desktop-lyrics .orb-lyrics-head {flex-shrink:0;align-items:center;}
+#orb-desktop-lyrics .orb-lyrics-head h2 {font-size:16px;}
+#orb-desktop-lyrics .orb-lyrics-content {
+ flex:1;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;
+ padding:16px 5px;scrollbar-width:thin;line-height:1.55;font-size:18px;white-space:pre-wrap;
+}
+#orb-desktop-lyrics button.orb-lyric-line {
+ appearance:none;display:block;width:100%;margin:0 0 6px;
+ padding:7px 9px;text-align:left;background:transparent;border:0;border-radius:10px;
+ color:var(--ink);font:inherit;line-height:1.5;opacity:.53;cursor:pointer;
+ transition:opacity .15s,background .15s;
+}
+#orb-desktop-lyrics button.orb-lyric-line:hover {background:color-mix(in srgb,var(--accent) 13%,transparent);opacity:.85;}
+#orb-desktop-lyrics button.orb-lyric-line.current {color:var(--accent);opacity:1;font-weight:700;}
+#orb-desktop-lyrics button.orb-lyric-line:focus-visible {outline:2px solid var(--accent);}
+@media(max-width:1100px){
+ #now-playing.orb-lyrics-open {grid-template-columns:minmax(145px,.75fr) minmax(190px,1fr) minmax(205px,.92fr);gap:14px;padding:25px 20px;}
+ #orb-desktop-lyrics.orb-expanded-lyrics {padding-left:12px;}
+}
+@media(max-width:740px) {
+ #now-playing.orb-lyrics-open {grid-template-columns:1fr;max-height:94dvh;overflow-y:auto;gap:14px;}
+ #now-playing.orb-lyrics-open .full-art {display:none;}
+ #orb-desktop-lyrics.orb-expanded-lyrics {height:min(43dvh,360px);border-left:0;border-top:1px solid var(--line);padding:16px 0 0;}
+}

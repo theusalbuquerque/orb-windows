@@ -1,0 +1,16 @@
+﻿bin/
+obj/
+publish/
+publish-*/
+dist/
+*.zip
+*.log
+*.user
+.vs/
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+secrets.json

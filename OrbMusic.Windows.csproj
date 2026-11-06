@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>OrbMusic.Windows</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <UseWinUI>true</UseWinUI>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Version>0.1.0-alpha9</Version>
+    <ApplicationIcon>Assets\orb.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.9169" />
+    <Content Include="Assets\orb.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Web\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
