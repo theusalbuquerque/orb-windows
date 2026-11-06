@@ -10,7 +10,35 @@
   host.addEventListener('message', event => {
     const data = event.data;
     if (!data || typeof data !== 'object') return;
-    // Reserve this channel for future native Orb Switch handshake messages.
+    if (data.type === 'orb-desktop:update') {
+      const check=document.getElementById('orb-check-update');
+      const install=document.getElementById('orb-install-update');
+      const status=document.getElementById('orb-update-status');
+      const progress=document.getElementById('orb-update-progress');
+      if (!check || !install || !status || !progress) return;
+      const busy=['checking','downloading','progress','installing'].includes(data.stage);
+      check.disabled=busy;
+      check.textContent=busy ? (data.stage==='checking' ? 'Verificando…' : 'Baixando…') : 'Buscar atualização';
+      progress.hidden=!['downloading','progress'].includes(data.stage);
+      if(typeof data.percent==='number') progress.value=Math.max(0,Math.min(100,data.percent));
+      if(data.stage==='ready') {
+        install.hidden=false;install.disabled=false;
+      } else if(data.stage==='checking' || data.stage==='current' || data.stage==='error' || data.stage==='downloading') {
+        install.hidden=true;
+      }
+      if(typeof data.message==='string') status.textContent=data.message;
+      else if(data.stage==='progress') status.textContent='Baixando '+(data.version||'atualização')+': '+Math.round(data.percent||0)+'%';
+    }
+  });
+
+  const checkUpdate=document.getElementById('orb-check-update');
+  if(checkUpdate)checkUpdate.addEventListener('click',()=>send({type:'orb-desktop:update-check'}));
+  const installUpdate=document.getElementById('orb-install-update');
+  if(installUpdate)installUpdate.addEventListener('click',()=>{
+    if(window.confirm('Deseja fechar o Orb Music e abrir o instalador da atualização baixada?')) {
+      installUpdate.disabled=true;
+      send({type:'orb-desktop:update-install'});
+    }
   });
 
   function sync() {

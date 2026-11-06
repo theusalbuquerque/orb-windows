@@ -15,6 +15,10 @@ public sealed partial class MainWindow : Window
     private string? _userId;
     private string? _session;
     private long _authGeneration;
+    private readonly OrbUpdateService _updater = new();
+    private int _updateBusy;
+    private OrbRelease? _downloadedRelease;
+    private string? _downloadedInstaller;
 
     public MainWindow()
     {
@@ -27,6 +31,7 @@ public sealed partial class MainWindow : Window
         {
             _ble.Dispose();
             _client.Dispose();
+            _updater.Dispose();
         };
         _ = InitializeBrowserAsync();
     }
@@ -96,11 +101,94 @@ public sealed partial class MainWindow : Window
                 case "orb-desktop:capabilities":
                     await SendCapabilityAsync();
                     break;
+                case "orb-desktop:update-check":
+                    await CheckAndDownloadUpdateAsync();
+                    break;
+                case "orb-desktop:update-install":
+                    await InstallDownloadedUpdateAsync();
+                    break;
             }
         }
         catch (Exception error)
         {
             Debug.WriteLine(error);
+        }
+    }
+
+    private async Task CheckAndDownloadUpdateAsync()
+    {
+        if (Interlocked.CompareExchange(ref _updateBusy, 1, 0) != 0) return;
+        _downloadedRelease = null;
+        _downloadedInstaller = null;
+        try
+        {
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "checking",
+                message = "Procurando uma atualização no GitHub…", installed = OrbUpdateService.CurrentVersion });
+            var release = await _updater.FindUpdateAsync();
+            if (release is null)
+            {
+                await SendToWebAsync(new { type = "orb-desktop:update", stage = "current",
+                    message = $"Você já está na versão mais recente ({OrbUpdateService.CurrentVersion})." });
+                return;
+            }
+
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "downloading",
+                message = $"Baixando Orb Music {release.Version}…", version = release.Version, percent = 0 });
+
+            var path = await _updater.DownloadAsync(release, percent =>
+            {
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    _ = SendToWebAsync(new { type = "orb-desktop:update",
+                        stage = "progress", percent, version = release.Version });
+                });
+            });
+            _downloadedRelease = release;
+            _downloadedInstaller = path;
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "ready", percent = 100,
+                version = release.Version, message = $"Orb Music {release.Version} baixado e verificado. Clique em Instalar atualização quando quiser." });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "error",
+                message = "Não foi possível baixar a atualização. Verifique a conexão e tente novamente." });
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _updateBusy, 0);
+        }
+    }
+
+    private async Task InstallDownloadedUpdateAsync()
+    {
+        var file = _downloadedInstaller;
+        var release = _downloadedRelease;
+        if (file is null || release is null) return;
+        if (Interlocked.CompareExchange(ref _updateBusy, 1, 0) != 0) return;
+        try
+        {
+            if (!await OrbUpdateService.VerifyDownloadedAsync(release, file))
+                throw new InvalidOperationException("A integridade do instalador não pôde ser confirmada.");
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "installing",
+                message = "Abrindo o instalador do Orb Music…" });
+            var started = Process.Start(new ProcessStartInfo(file)
+            {
+                UseShellExecute = true,
+                WorkingDirectory = Path.GetDirectoryName(file)
+            });
+            if (started is null) throw new InvalidOperationException("Não foi possível iniciar o instalador.");
+            Microsoft.UI.Xaml.Application.Current.Exit();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            await SendToWebAsync(new { type = "orb-desktop:update", stage = "error",
+                message = "Não foi possível abrir o instalador. Verifique o arquivo baixado." });
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _updateBusy, 0);
         }
     }
 

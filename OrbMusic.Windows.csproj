@@ -13,7 +13,7 @@
     <Platforms>x64</Platforms>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <Version>0.1.0-alpha9</Version>
+    <Version>0.1.0-alpha10</Version>
     <ApplicationIcon>Assets\orb.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>

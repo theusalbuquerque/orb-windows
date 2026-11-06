@@ -213,6 +213,15 @@ button.danger:hover:not(:disabled){background:#ff4d4f;color:#fff}
 <label class="setting-row" for="dynamic-glass"><span><strong>Expressive Glass Dinâmico</strong><small>Usar as cores da capa durante a reprodução.</small></span><input id="dynamic-glass" type="checkbox" role="switch"></label>
 <p class="settings-note">Esta preferência altera somente o Orb Music neste computador.</p>
 <p id="theme-pairing-hint" class="settings-note" hidden>Conecte novamente pelo app atualizado para importar as cores do seu tema.</p></div>
+<div class="settings-card" id="orb-update-card">
+<h2 class="settings-title">Atualizações</h2>
+<div class="setting-row static"><span><strong>Atualizações do Orb Music</strong>
+<small>Procure novas versões para Windows. O instalador será baixado do GitHub e verificado antes da instalação.</small></span>
+<button id="orb-check-update" type="button" class="pill">Buscar atualização</button></div>
+<progress id="orb-update-progress" class="orb-update-progress" max="100" value="0" hidden></progress>
+<p id="orb-update-status" class="settings-note" role="status" aria-live="polite">Versão instalada: 0.1.0-alpha10</p>
+<button id="orb-install-update" class="pill" type="button" hidden>Instalar atualização</button>
+</div>
 <div class="settings-card"><h2 class="settings-title">Sessão</h2>
 <div class="setting-row static"><span><strong>Desconectar este computador</strong><small>Encerra a sessão do Orb Music neste computador e volta para o QR code. Para entrar de novo, leia o código pelo app Orb.</small></span><button id="logout" class="danger" type="button">Desconectar</button></div></div>
 </section></div></main>

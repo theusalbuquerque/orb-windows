@@ -274,3 +274,14 @@ input.orb-worm-seek[type="range"]:disabled {cursor:default;opacity:.5;}
  #now-playing.orb-lyrics-open .full-art {display:none;}
  #orb-desktop-lyrics.orb-expanded-lyrics {height:min(43dvh,360px);border-left:0;border-top:1px solid var(--line);padding:16px 0 0;}
 }
+
+/* Orb Music Windows - manual update checker */
+#orb-update-card .setting-row.static { gap:18px; align-items:center; }
+#orb-update-card #orb-check-update { flex-shrink:0; }
+#orb-update-card .orb-update-progress { display:block; width:100%; height:6px; margin:16px 0 6px; accent-color:var(--accent); border-radius:999px; overflow:hidden; }
+#orb-update-card .orb-update-progress[hidden] {display:none;}
+#orb-update-card #orb-install-update:not([hidden]) {margin-top:12px;}
+#orb-update-card #orb-check-update:disabled {opacity:.55;cursor:wait;}
+@media(max-width:640px) {
+  #orb-update-card .setting-row.static {flex-wrap:wrap;}
+}
